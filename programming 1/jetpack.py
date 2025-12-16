@@ -7,8 +7,8 @@ import math
 pygame.init()
 
 # --- Game Constants ---
-SCREEN_WIDTH = 1000
-SCREEN_HEIGHT = 700
+SCREEN_WIDTH = 800
+SCREEN_HEIGHT = 600
 SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
 pygame.display.set_caption("Jetpack Joyride Pygame")
 
@@ -40,66 +40,35 @@ except pygame.error as e:
 # --- Einde van nieuwe sectie ---
 
 # Game Physics / State Initialization
-# Game Physics / State Initialization
 FPS = 60
 clock = pygame.time.Clock()
 
-# Colors (Zorg ervoor dat u deze constanten ook heeft)
-# WHITE = (255, 255, 255)
-# ...
-
-# --- Player Constants (CONTROLEER DEZE SECTIE) ---
-PLAYER_WIDTH = 60
+# Player Constants
+PLAYER_WIDTH = 80
 PLAYER_HEIGHT = 100
-PLAYER_START_X = 80
+PLAYER_START_X = 120
+GROUND_Y = SCREEN_HEIGHT - 16 - PLAYER_HEIGHT
+CEILING_Y = 16
 
-# GROUND_Y wordt hier gedefinieerd: 
-# Dit is de hoogte van het scherm, minus de vloerband (16) en minus de hoogte van de speler.
-GROUND_Y = SCREEN_HEIGHT - 16 - PLAYER_HEIGHT 
-
-CEILING_Y = 16 
-# --- Einde Player Constants ---
-
-# --- NIEUW: Sprite Sheet Constants (Zoals recentelijk toegevoegd) ---
-SPRITE_SHEET_NAME = 'sprites/barry_sprite_sheet.png'
-FRAME_WIDTH = 90
-# ...
-
-# --- NIEUW: Sprite Sheet Constants ---
-# --- NIEUW: Sprite Sheet Constants ---
-SPRITE_SHEET_NAME = 'sprites/barry_sprite_sheet.png'
-FRAME_WIDTH = 90
-FRAME_HEIGHT = 110
-
-# Definieer de animatie zones op basis van de aanname:
-# (Start Frame Index, Aantal Frames, Snelheid van de animatie)
-ANIM_WALK = (0, 4, 0.4)   # Frames 0, 1, 2, 3
-ANIM_FLY = (4, 2, 0.3)    # Frames 4, 5
-ANIM_FALL = (6, 2, 0.2)   # Frames 6, 7
-
-# Nieuwe Game Variabelen
-current_frame_index = 30 # De index binnen de huidige animatie zone (niet de absolute index)
-current_animation_set = ANIM_FLY # Start met vliegen
-
-# Nieuwe Game Variabelen
-current_frame = 0
 
 # --- NIEUW: Spelerafbeelding Laden ---
-# --- Spelerafbeelding Laden (AANGEPAST VOOR SHEET) ---
 try:
-    # 1. Laad de volledige sprite sheet
-    SPRITE_SHEET = pygame.image.load('programming 1/sprites/barry_sprite_sheet.png').convert_alpha() 
+    # Zorg ervoor dat u een map genaamd 'sprites' heeft
+    # en dat de afbeelding daar is opgeslagen (bijv. 'barry_jetpack.png')
+    PLAYER_IMAGE = pygame.image.load('programming 1/sprites/barry_jetpack.png').convert_alpha() 
+    # Schaal de afbeelding naar de juiste grootte
+    PLAYER_IMAGE = pygame.transform.scale(PLAYER_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT + 10))
     
-    # Optioneel: Schaal de frames indien nodig (we gaan ervan uit dat 60x60 goed is)
-    # Zo niet: SPRITE_SHEET = pygame.transform.scale(...)
+    # Optioneel: Maak een 'thrusting' versie (met vlammen)
+    # Dit is een simpele manier: we kantelen de afbeelding iets als de speler stuwt
+    PLAYER_THRUST_IMAGE = pygame.transform.rotate(PLAYER_IMAGE, 10) 
     
     player_image_loaded = True
-    print("Sprite Sheet geladen.")
+    print("Spelerafbeelding geladen.")
 except pygame.error as e:
-    print(f"Fout bij het laden van de sprite sheet: {e}. Standaard gekleurde speler wordt gebruikt.")
-    SPRITE_SHEET = None
+    print(f"Fout bij het laden van de spelerafbeelding: {e}. Standaard gekleurde speler wordt gebruikt.")
+    PLAYER_IMAGE = None
     player_image_loaded = False
-# --- Einde Spelerafbeelding Laden ---
 # --- Einde Spelerafbeelding Laden ---
 
 # Game Variables
@@ -128,7 +97,7 @@ MAX_VELOCITY = 36 # Slight increase to accommodate higher forces
 
 # Timing for Spawning (in frames)
 # --- ADJUSTED: Reduced spawn rate for more obstacles ---
-OBSTACLE_SPAWN_RATE = int(0.3 * FPS) # Reduced from 1.4 * FPS
+OBSTACLE_SPAWN_RATE = int(0.5 * FPS) # Reduced from 1.4 * FPS
 COIN_SPAWN_RATE = int(0.4 * FPS)
 obstacle_spawn_counter = OBSTACLE_SPAWN_RATE
 coin_spawn_counter = COIN_SPAWN_RATE
@@ -146,7 +115,7 @@ MISSIONS = [
 ]
 
 GADGETS = [
-    {'name': 'Coin Magnet', 'price': 5000, 'purchased': True, 'active': False, 'magnet_range': 120}, 
+    {'name': 'Coin Magnet', 'price': 5000, 'purchased': True, 'active': False, 'magnet_range': 200}, 
     {'name': 'Force Shield', 'price': 8000, 'purchased': False, 'active': False},
     {'name': 'Speed Boost', 'price': 8000, 'purchased': False, 'active': False, 'speed_multiplier': 1.8}
 ]
@@ -170,71 +139,73 @@ def get_active_look():
 
 # --- Utility Functions (draw_player AANGEPAST) ---
 
-# --- Utility Functions (draw_player AANGEPAST VOOR SPRITE SHEET) ---
-
 def draw_player(surface, x, y, thrusting):
-    """Draws the player using the calculated animation frame from the sprite sheet."""
+    """Draws the player using an image if loaded, otherwise uses the colored box."""
     
-    global SPRITE_SHEET, player_image_loaded, current_frame_index, current_animation_set, FRAME_WIDTH, FRAME_HEIGHT
+    global PLAYER_IMAGE, PLAYER_THRUST_IMAGE, player_image_loaded
     
-    # --- HITBOX DRAWING (OPTIONEEL VOOR DEBUGGING) ---
-    # Hitbox marges (dezelfde als in update_elements)
-    HITBOX_MARGIN_X = 10 
-    HITBOX_MARGIN_Y = 5
+    # Berekent de rect voor botsing en positie, ongeacht of de afbeelding wordt gebruikt
+    player_rect = pygame.Rect(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
     
-    # De werkelijke hitbox die wordt gebruikt voor botsing (kan voor debuggen worden getekend)
-    player_rect_hitbox = pygame.Rect(
-        x + HITBOX_MARGIN_X, 
-        y + HITBOX_MARGIN_Y,      
-        PLAYER_WIDTH - 2 * HITBOX_MARGIN_X, 
-        PLAYER_HEIGHT - 2 * HITBOX_MARGIN_Y 
-    )
-    # pygame.draw.rect(surface, (255, 0, 0, 100), player_rect_hitbox, 1) # Trek deze lijn uit om de hitbox rood te tekenen
-    # ----------------------------------------------------
-    
-    if player_image_loaded and SPRITE_SHEET:
+    if player_image_loaded:
+        # Teken de afbeelding
+        # We gebruiken y-5 zodat de jetpack (die we extra hoogte hebben gegeven) niet door de grond gaat
         
-        # Haal de start index van de huidige animatie set op
-        start_frame_index = current_animation_set[1]
-        
-        # Bereken de absolute X-positie op de sheet
-        absolute_frame_x = (start_frame_index + current_frame_index) * FRAME_WIDTH
-        
-        # Bepaal het rechthoekige gebied op de sprite sheet dat we moeten tekenen
-        source_rect = pygame.Rect(absolute_frame_x, 0, FRAME_WIDTH, FRAME_HEIGHT)
-        
-        # Teken het frame. Gebruik een offset (x-10, y-10) om het 60x60 frame te centreren 
-        # rond de 40x50 spelerpositie voor een mooiere uitlijning.
-        surface.blit(SPRITE_SHEET, (x - 10, y - 10), source_rect)
-        
-        # De vlammen moeten alleen worden getekend als de sprite sheet geen vlammen bevat
-        if thrusting and current_animation_set == ANIM_FLY:
-             # Eenvoudig vlam-effect (indien nodig, anders weghalen)
-             flame_height = random.randint(10, 20)
-             flame_width = random.randint(8, 15)
-             flame_points = [
-                 (x - 10, y + 40), (x - 10 - flame_width // 2, y + 40 + flame_height // 2),
-                 (x - 10, y + 40 + flame_height), (x - 10 + flame_width // 2, y + 40 + flame_height // 2)
-             ]
-             # Teken de vlammen achter de speler (Jetpack-locatie)
-             pygame.draw.polygon(surface, RED, flame_points)
-             pygame.draw.polygon(surface, YELLOW, [(p[0], p[1]-2) for p in flame_points])
+        if thrusting:
+            # Gebruik de kantelende afbeelding wanneer de speler stuwt
+            img_to_use = PLAYER_THRUST_IMAGE
+            # De blit-positie moet mogelijk worden aangepast vanwege de rotatie/afmetingen
+            surface.blit(img_to_use, (x - 5, y - 5)) 
             
+            # Teken een eenvoudig vlam-effect
+            flame_height = random.randint(10, 20)
+            flame_width = random.randint(8, 15)
+            # Plaats de vlam onder de jetpack (links van de speler)
+            flame_points = [
+                (x - 10, y + 40), 
+                (x - 10 - flame_width // 2, y + 40 + flame_height // 2),
+                (x - 10, y + 40 + flame_height),
+                (x - 10 + flame_width // 2, y + 40 + flame_height // 2)
+            ]
+            pygame.draw.polygon(surface, RED, flame_points)
+            pygame.draw.polygon(surface, YELLOW, [(p[0], p[1]-2) for p in flame_points])
+            
+        else:
+            # Standaard afbeelding
+            img_to_use = PLAYER_IMAGE
+            surface.blit(img_to_use, (x, y - 5)) 
+
     else:
-        # VAL RUG OP EENVOUDIG GEKLEURD BLOK (als de sheet niet geladen is)
+        # Val terug op de gekleurde Pygame-box als de afbeelding niet is geladen
         active_look = get_active_look()
         suit_color = active_look['color']
-        player_rect_fallback = pygame.Rect(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
-        pygame.draw.rect(surface, suit_color, player_rect_fallback, border_radius=5)
-        # ... (voeg hier de rest van de oude fallback logica toe, zoals goggle en jetpack) ...
-
-    # Draw Coin Magnet Aura
+        
+        # Oude Pygame box tekenlogica (zoals eerder)
+        pygame.draw.rect(surface, suit_color, player_rect, border_radius=5)
+        pygame.draw.rect(surface, (60, 40, 20), (x+5, y, 30, 10)) # Baard
+        pygame.draw.circle(surface, BLACK, (x + PLAYER_WIDTH // 2, y + 8), 10) # Goggles
+        pygame.draw.circle(surface, (100, 200, 255), (x + PLAYER_WIDTH // 2, y + 8), 8)
+        
+        # Oude Jetpack en Vlammen logica
+        pygame.draw.rect(surface, RED, (x - 10, y + 10, 10, 30), border_radius=3)
+        pygame.draw.polygon(surface, WHITE, [(x - 10, y + 10), (x - 10, y + 40), (x - 20, y + 25)]) 
+        
+        if thrusting:
+            flame_height = random.randint(15, 25)
+            flame_width = random.randint(10, 20)
+            flame_points = [
+                (x - 5, y + 40), (x - 5 - flame_width // 2, y + 40 + flame_height // 2),
+                (x - 5, y + 40 + flame_height), (x - 5 + flame_width // 2, y + 40 + flame_height // 2)
+            ]
+            pygame.draw.polygon(surface, RED, flame_points)
+            pygame.draw.polygon(surface, YELLOW, [(p[0], p[1]-3) for p in flame_points])
+            
+    # Draw Coin Magnet Aura (deze blijft hetzelfde)
     magnet_gadget = next((g for g in GADGETS if g['name'] == 'Coin Magnet'), None)
     if magnet_gadget and magnet_gadget['purchased']:
         magnet_range = magnet_gadget['magnet_range']
         magnet_surface = pygame.Surface((magnet_range * 2, magnet_range * 2), pygame.SRCALPHA)
-        # De kleur is hier instelbaar: (R, G, B, A)
-        pygame.draw.circle(magnet_surface, (255, 255, 0, 50), (magnet_range, magnet_range), magnet_range)
+        pygame.draw.circle(magnet_surface, (0, 0, 0, 0), (magnet_range, magnet_range), magnet_range)
         SCREEN.blit(magnet_surface, (x + PLAYER_WIDTH // 2 - magnet_range, y + PLAYER_HEIGHT // 2 - magnet_range))
 
 def draw_obstacle(surface, obstacle):
@@ -369,6 +340,7 @@ def update_player(dt):
         player_y = CEILING_Y
         velocity = 0
 
+
 def apply_coin_magnet(dt, player_center_x, player_center_y):
     """Pulls coins towards the player when the magnet is purchased."""
     global coin_items, coins, score
@@ -411,38 +383,14 @@ def apply_coin_magnet(dt, player_center_x, player_center_y):
 
 
 def update_elements(dt):
-    global obstacles, coin_items, speed, distance, score, coins, game_over, zapper_count, is_speed_boosting, current_tick, current_frame_index, current_animation_set, player_y, velocity
+    global obstacles, coin_items, speed, distance, score, coins, game_over, zapper_count, is_speed_boosting, current_tick
 
-    current_tick += 0.5 # Update global game tick
-    
-    # --- NIEUW: Selecteer de Juiste Animatie Set ---
-    if SPRITE_SHEET:
-        # 1. Bepaal de animatie:
-        if player_y >= GROUND_Y:
-            # Loop animatie (als we op de grond staan)
-            new_animation_set = ANIM_WALK
-        elif is_thrusting or velocity < 0:
-            # Vlieg animatie (stuwen of omhoog gaan)
-            new_animation_set = ANIM_FLY
-        else:
-            # Val animatie (vallen of in rust/naar beneden bewegen)
-            new_animation_set = ANIM_FALL
-        
-        # 2. Reset de frame index als de animatie is gewisseld
-        if new_animation_set != current_animation_set:
-            current_frame_index = 0
-            current_animation_set = new_animation_set
-            
-        # 3. Update het huidige frame index (binnen de set)
-        start_frame, num_frames, anim_speed = current_animation_set
-        current_frame_index = int((current_tick * anim_speed) % num_frames)
-        
-    # --- EINDE ANIMATIE UPDATE ---
+    current_tick += 1 # Update global game tick
     
     # --- 1. Calculate Current Speed ---
     speed_boost_gadget = next((g for g in GADGETS if g['name'] == 'Speed Boost'), None)
     
-    base_speed_increase = (BASE_SPEED + 0.02 * distance)
+    base_speed_increase = (BASE_SPEED + 0.002 * distance)
     
     if speed_boost_gadget and speed_boost_gadget['purchased'] and is_speed_boosting:
         current_speed = base_speed_increase * speed_boost_gadget['speed_multiplier']
@@ -451,27 +399,15 @@ def update_elements(dt):
         
     speed = min(current_speed * dt, 15.0) 
     
-    # --- 2. Update Player Rect and Center (AANGEPAST: VERKLEINDE HITBOX) ---
-    
-    # Marges voor de hitbox (moet bovenaan het script gedefinieerd zijn als constanten!)
-    HITBOX_MARGIN_X = 10  
-    HITBOX_MARGIN_Y = 0
-    
-    # Creëer de verkleinde hitbox voor de speler
-    player_rect = pygame.Rect(
-        PLAYER_START_X + HITBOX_MARGIN_X,
-        player_y + HITBOX_MARGIN_Y,     
-        PLAYER_WIDTH - 2 * HITBOX_MARGIN_X, 
-        PLAYER_HEIGHT - 2 * HITBOX_MARGIN_Y 
-    )
-    
-    player_center_x = player_rect.centerx
-    player_center_y = player_rect.centery
+    # --- 2. Update Player Rect and Center ---
+    player_rect = pygame.Rect(PLAYER_START_X, player_y, PLAYER_WIDTH, PLAYER_HEIGHT)
+    player_center_x = PLAYER_START_X + PLAYER_WIDTH // 2
+    player_center_y = player_y + PLAYER_HEIGHT // 2
 
-    # --- 3. Apply Coin Magnet Effect ---
+    # --- 3. Apply Coin Magnet Effect (before moving coins) ---
     apply_coin_magnet(dt, player_center_x, player_center_y)
 
-    # --- 4. Move and Check Obstacles ---
+    # --- 4. Move and Check Obstacles (Handling Dynamic Obstacles) ---
     updated_obstacles = []
     for obs in obstacles:
         # Move horizontally
@@ -481,31 +417,32 @@ def update_elements(dt):
         collision = False
 
         if obs['type'] == 'top':
-            height = int(obs['height'])
-            obs_rect = pygame.Rect(obs['x'], 16, 60, height)
+            obs_rect = pygame.Rect(obs['x'], 16, 60, obs['height'])
             
         elif obs['type'] == 'bottom':
-            height = int(obs['height'])
-            y = SCREEN_HEIGHT - 16 - height
-            obs_rect = pygame.Rect(obs['x'], y, 60, height)
+            y = SCREEN_HEIGHT - 16 - obs['height']
+            obs_rect = pygame.Rect(obs['x'], y, 60, obs['height'])
             
         elif obs['type'] == 'floating':
             obs_rect = pygame.Rect(obs['x'], obs['y'], obs['size'], obs['size'])
             
         # --- Dynamic Obstacle Logic ---
         elif obs['type'] == 'moving_block':
+            # Vertical movement: use sine wave for smooth up/down motion
             obs['current_y'] = obs['start_y'] + obs['amplitude'] * math.sin(current_tick / obs['speed_factor'])
             obs_rect = pygame.Rect(obs['x'], obs['current_y'], 60, 60)
             
         elif obs['type'] == 'rotating_laser':
+            # Rotation: constant angular speed
             obs['angle'] += obs['rotation_speed'] * dt
             obs['angle'] %= 360
             
             center = (obs['x'] + obs['radius'], obs['y'])
             p1, p2 = get_rotated_rect(center, obs['length'], obs['angle'])
             
+            # Use the dedicated line collision check
             if check_line_collision(player_rect, p1, p2):
-                collision = True
+                 collision = True
 
         # Check for collision 
         if obs_rect and player_rect.colliderect(obs_rect):
@@ -514,17 +451,18 @@ def update_elements(dt):
         if collision:
             game_over = True
         
+        # Check if obstacle is passed (for mission tracking)
         if obs['x'] + 60 < PLAYER_START_X and not obs.get('passed'):
             if obs['type'] in ['floating', 'rotating_laser', 'moving_block']:
                 zapper_count += 1
             obs['passed'] = True
             
-        if obs['x'] > -200: 
+        if obs['x'] > -200: # Keep dynamic obstacles on screen longer
             updated_obstacles.append(obs)
             
     obstacles = updated_obstacles
 
-    # --- 5. Move Coins ---
+    # --- 5. Move Coins (that weren't magnet-pulled/collected) ---
     updated_coins = []
     for coin in coin_items:
         if not coin.get('pulling'):
@@ -545,10 +483,13 @@ def update_elements(dt):
     distance += 0.1 * dt
     score += 1 * dt
     
+    # Update distance mission progress
     MISSIONS[1]['progress'] = math.floor(distance)
     MISSIONS[2]['progress'] = zapper_count
     
     check_missions()
+
+
 def check_missions():
     global coins
     for mission in MISSIONS:
@@ -899,12 +840,14 @@ def main():
                     # Standaard kleur als de afbeelding niet is geladen
                     SCREEN.fill((52, 152, 219))
                 # --- Einde Achtergrond Tekenen ---
+                
+                # De verticale lijnen geven nu een gevoel van beweging
 
                 pygame.draw.rect(SCREEN, GRAY_CEILING, (0, 0, SCREEN_WIDTH, 16))
                 pygame.draw.rect(SCREEN, (100, 100, 100), (0, 0, SCREEN_WIDTH, 16), 4)
                 pygame.draw.rect(SCREEN, GRAY_FLOOR, (0, SCREEN_HEIGHT - 16, SCREEN_WIDTH, 16))
                 pygame.draw.rect(SCREEN, (100, 100, 100), (0, SCREEN_HEIGHT - 16, SCREEN_WIDTH, 16), 4)
-                
+                    
                 for obs in obstacles:
                     draw_obstacle(SCREEN, obs)
                     
@@ -929,7 +872,7 @@ def main():
         elif game_state == 'menu':
             play_button, gadgets_button, _ = draw_menu() 
             
-        if game_state == 'gadgets':
+        elif game_state == 'gadgets':
             shop_back_button, gadget_shop_buttons, look_shop_buttons = draw_gadget_store()
 
         pygame.display.flip()
