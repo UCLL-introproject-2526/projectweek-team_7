@@ -6,6 +6,39 @@ import math
 # Initialize Pygame
 pygame.init()
 
+# --- Initialiseer de Mixer (Belangrijk!) ---
+pygame.mixer.init()
+
+MUSIC_FILE = 'programming 1/audio/Cyberpunk Moonlight Sonata.mp3' # Pas het pad en de naam aan!
+
+def start_background_music():
+    """Laadt de muziek en begint met afspelen in een lus (-1)."""
+    global MUSIC_FILE
+    
+    try:
+        # Laad de muziek
+        pygame.mixer.music.load(MUSIC_FILE)
+        
+        # Start de muziek: -1 betekent oneindig herhalen
+        pygame.mixer.music.play(-1) 
+        
+        # Optioneel: Stel het volume in (0.0 tot 1.0)
+        pygame.mixer.music.set_volume(0.5) 
+        print(f"Achtergrondmuziek '{MUSIC_FILE}' gestart.")
+        
+    except pygame.error as e:
+        print(f"Fout bij het laden of afspelen van muziek: {e}")
+        print("Controleer of het bestandspad en het formaat correct zijn.")
+
+# --- In de hoofdsectie van uw script (na de functie definities) ---
+
+# ...
+
+# --- ROEP DE MUZIEK START FUNCTIE HIER AAN ---
+start_background_music()
+# --------------------------------------------
+
+# Start de hoofdloop
 # --- Game Constants ---
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -91,13 +124,13 @@ current_tick = 0 # Added for time-dependent obstacle movement
 
 # Physics constants
 # --- ADJUSTED: Increased GRAVITY and THRUST_POWER for faster vertical response ---
-GRAVITY = 1.6  # Increased from 0.8
+GRAVITY = 2  # Increased from 0.8
 THRUST_POWER = -16 # Increased from -8
 MAX_VELOCITY = 36 # Slight increase to accommodate higher forces
 
 # Timing for Spawning (in frames)
 # --- ADJUSTED: Reduced spawn rate for more obstacles ---
-OBSTACLE_SPAWN_RATE = int(0.5 * FPS) # Reduced from 1.4 * FPS
+OBSTACLE_SPAWN_RATE = int(0.3 * FPS) # Reduced from 1.4 * FPS
 COIN_SPAWN_RATE = int(0.4 * FPS)
 obstacle_spawn_counter = OBSTACLE_SPAWN_RATE
 coin_spawn_counter = COIN_SPAWN_RATE
@@ -115,7 +148,7 @@ MISSIONS = [
 ]
 
 GADGETS = [
-    {'name': 'Coin Magnet', 'price': 5000, 'purchased': True, 'active': False, 'magnet_range': 200}, 
+    {'name': 'Coin Magnet', 'price': 5000, 'purchased': False, 'active': False, 'magnet_range': 200}, 
     {'name': 'Force Shield', 'price': 8000, 'purchased': False, 'active': False},
     {'name': 'Speed Boost', 'price': 8000, 'purchased': False, 'active': False, 'speed_multiplier': 1.8}
 ]
@@ -133,7 +166,6 @@ def get_active_look():
         if look['active']:
             return look
     return CHARACTER_LOOKS[0] # Fallback
-
 
 # --- Utility Functions ---
 
