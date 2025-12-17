@@ -6,6 +6,39 @@ import math
 # Initialize Pygame
 pygame.init()
 
+# --- Initialiseer de Mixer (Belangrijk!) ---
+pygame.mixer.init()
+
+MUSIC_FILE = 'programming 1/audio/Cyberpunk Moonlight Sonata.mp3' # Pas het pad en de naam aan!
+
+def start_background_music():
+    """Laadt de muziek en begint met afspelen in een lus (-1)."""
+    global MUSIC_FILE
+    
+    try:
+        # Laad de muziek
+        pygame.mixer.music.load(MUSIC_FILE)
+        
+        # Start de muziek: -1 betekent oneindig herhalen
+        pygame.mixer.music.play(-1) 
+        
+        # Optioneel: Stel het volume in (0.0 tot 1.0)
+        pygame.mixer.music.set_volume(0.5) 
+        print(f"Achtergrondmuziek '{MUSIC_FILE}' gestart.")
+        
+    except pygame.error as e:
+        print(f"Fout bij het laden of afspelen van muziek: {e}")
+        print("Controleer of het bestandspad en het formaat correct zijn.")
+
+# --- In de hoofdsectie van uw script (na de functie definities) ---
+
+# ...
+
+# --- ROEP DE MUZIEK START FUNCTIE HIER AAN ---
+start_background_music()
+# --------------------------------------------
+
+# Start de hoofdloop
 # --- Game Constants ---
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
@@ -28,7 +61,11 @@ BUTTON_GREEN = (76, 175, 80)
 try:
     # Probeer de achtergrondafbeelding te laden uit de map 'background'
     # Pas 'achtergrond.jpg' aan naar de daadwerkelijke naam van uw bestand
+<<<<<<< HEAD:test/programming 1/jetpack.py
     BACKGROUND_IMAGE = pygame.image.load(r"test\programming 1\background\achtergrond.jpg").convert() 
+=======
+    BACKGROUND_IMAGE = pygame.image.load('programming 1/background/achtergrond.jpg').convert() 
+>>>>>>> 6079e424125df335879ca8ab12595b095600fb00:programming 1/jetpack.py
     # Schaal de afbeelding naar de schermgrootte
     BACKGROUND_IMAGE = pygame.transform.scale(BACKGROUND_IMAGE, (SCREEN_WIDTH, SCREEN_HEIGHT))
     background_loaded = True
@@ -44,11 +81,32 @@ FPS = 60
 clock = pygame.time.Clock()
 
 # Player Constants
-PLAYER_WIDTH = 40
-PLAYER_HEIGHT = 50
-PLAYER_START_X = 80
+PLAYER_WIDTH = 80
+PLAYER_HEIGHT = 100
+PLAYER_START_X = 120
 GROUND_Y = SCREEN_HEIGHT - 16 - PLAYER_HEIGHT
 CEILING_Y = 16
+
+
+# --- NIEUW: Spelerafbeelding Laden ---
+try:
+    # Zorg ervoor dat u een map genaamd 'sprites' heeft
+    # en dat de afbeelding daar is opgeslagen (bijv. 'barry_jetpack.png')
+    PLAYER_IMAGE = pygame.image.load('programming 1/sprites/barry_jetpack.png').convert_alpha() 
+    # Schaal de afbeelding naar de juiste grootte
+    PLAYER_IMAGE = pygame.transform.scale(PLAYER_IMAGE, (PLAYER_WIDTH, PLAYER_HEIGHT + 10))
+    
+    # Optioneel: Maak een 'thrusting' versie (met vlammen)
+    # Dit is een simpele manier: we kantelen de afbeelding iets als de speler stuwt
+    PLAYER_THRUST_IMAGE = pygame.transform.rotate(PLAYER_IMAGE, 10) 
+    
+    player_image_loaded = True
+    print("Spelerafbeelding geladen.")
+except pygame.error as e:
+    print(f"Fout bij het laden van de spelerafbeelding: {e}. Standaard gekleurde speler wordt gebruikt.")
+    PLAYER_IMAGE = None
+    player_image_loaded = False
+# --- Einde Spelerafbeelding Laden ---
 
 # Game Variables
 game_state = 'menu' # Can be 'menu', 'playing', 'gadgets'
@@ -70,14 +128,19 @@ current_tick = 0 # Added for time-dependent obstacle movement
 
 # Physics constants
 # --- ADJUSTED: Increased GRAVITY and THRUST_POWER for faster vertical response ---
-GRAVITY = 1.6  # Increased from 0.8
+GRAVITY = 2  # Increased from 0.8
 THRUST_POWER = -16 # Increased from -8
 MAX_VELOCITY = 36 # Slight increase to accommodate higher forces
 
 # Timing for Spawning (in frames)
 # --- ADJUSTED: Reduced spawn rate for more obstacles ---
+<<<<<<< HEAD:test/programming 1/jetpack.py
 OBSTACLE_SPAWN_RATE = int(0.4 * FPS) # Reduced from 1.4 * FPS
 COIN_SPAWN_RATE = int(1.2 * FPS)
+=======
+OBSTACLE_SPAWN_RATE = int(0.3 * FPS) # Reduced from 1.4 * FPS
+COIN_SPAWN_RATE = int(0.4 * FPS)
+>>>>>>> 6079e424125df335879ca8ab12595b095600fb00:programming 1/jetpack.py
 obstacle_spawn_counter = OBSTACLE_SPAWN_RATE
 coin_spawn_counter = COIN_SPAWN_RATE
 
@@ -94,7 +157,7 @@ MISSIONS = [
 ]
 
 GADGETS = [
-    {'name': 'Coin Magnet', 'price': 5000, 'purchased': True, 'active': False, 'magnet_range': 120}, 
+    {'name': 'Coin Magnet', 'price': 5000, 'purchased': False, 'active': False, 'magnet_range': 200}, 
     {'name': 'Force Shield', 'price': 8000, 'purchased': False, 'active': False},
     {'name': 'Speed Boost', 'price': 8000, 'purchased': False, 'active': False, 'speed_multiplier': 1.8}
 ]
@@ -113,51 +176,78 @@ def get_active_look():
             return look
     return CHARACTER_LOOKS[0] # Fallback
 
-
 # --- Utility Functions ---
 
+# --- Utility Functions (draw_player AANGEPAST) ---
+
 def draw_player(surface, x, y, thrusting):
-    """Draws the player using the currently active character look."""
+    """Draws the player using an image if loaded, otherwise uses the colored box."""
     
-    active_look = get_active_look()
-    suit_color = active_look['color']
+    global PLAYER_IMAGE, PLAYER_THRUST_IMAGE, player_image_loaded
     
-    # Body
+    # Berekent de rect voor botsing en positie, ongeacht of de afbeelding wordt gebruikt
     player_rect = pygame.Rect(x, y, PLAYER_WIDTH, PLAYER_HEIGHT)
-    pygame.draw.rect(surface, suit_color, player_rect, border_radius=5)
     
-    # Beard/Hair (remains the same color for all looks)
-    pygame.draw.rect(surface, (60, 40, 20), (x+5, y, 30, 10))
-    
-    # Goggles
-    pygame.draw.circle(surface, BLACK, (x + PLAYER_WIDTH // 2, y + 8), 10)
-    pygame.draw.circle(surface, (100, 200, 255), (x + PLAYER_WIDTH // 2, y + 8), 8) # Blue lens
-
-    # Jetpack Rocket
-    pygame.draw.rect(surface, RED, (x - 10, y + 10, 10, 30), border_radius=3)
-    pygame.draw.polygon(surface, WHITE, [(x - 10, y + 10), (x - 10, y + 40), (x - 20, y + 25)]) # Cone
-
-    if thrusting:
-        # Flame effect
-        flame_height = random.randint(15, 25)
-        flame_width = random.randint(10, 20)
-        flame_points = [
-            (x - 5, y + 40), # Below the rocket
-            (x - 5 - flame_width // 2, y + 40 + flame_height // 2),
-            (x - 5, y + 40 + flame_height),
-            (x - 5 + flame_width // 2, y + 40 + flame_height // 2)
-        ]
-        pygame.draw.polygon(surface, RED, flame_points)
-        pygame.draw.polygon(surface, YELLOW, [(p[0], p[1]-3) for p in flame_points])
+    if player_image_loaded:
+        # Teken de afbeelding
+        # We gebruiken y-5 zodat de jetpack (die we extra hoogte hebben gegeven) niet door de grond gaat
         
-    # Draw Coin Magnet Aura (Visual Feedback)
+        if thrusting:
+            # Gebruik de kantelende afbeelding wanneer de speler stuwt
+            img_to_use = PLAYER_THRUST_IMAGE
+            # De blit-positie moet mogelijk worden aangepast vanwege de rotatie/afmetingen
+            surface.blit(img_to_use, (x - 5, y - 5)) 
+            
+            # Teken een eenvoudig vlam-effect
+            flame_height = random.randint(10, 20)
+            flame_width = random.randint(8, 15)
+            # Plaats de vlam onder de jetpack (links van de speler)
+            flame_points = [
+                (x - 10, y + 40), 
+                (x - 10 - flame_width // 2, y + 40 + flame_height // 2),
+                (x - 10, y + 40 + flame_height),
+                (x - 10 + flame_width // 2, y + 40 + flame_height // 2)
+            ]
+            pygame.draw.polygon(surface, RED, flame_points)
+            pygame.draw.polygon(surface, YELLOW, [(p[0], p[1]-2) for p in flame_points])
+            
+        else:
+            # Standaard afbeelding
+            img_to_use = PLAYER_IMAGE
+            surface.blit(img_to_use, (x, y - 5)) 
+
+    else:
+        # Val terug op de gekleurde Pygame-box als de afbeelding niet is geladen
+        active_look = get_active_look()
+        suit_color = active_look['color']
+        
+        # Oude Pygame box tekenlogica (zoals eerder)
+        pygame.draw.rect(surface, suit_color, player_rect, border_radius=5)
+        pygame.draw.rect(surface, (60, 40, 20), (x+5, y, 30, 10)) # Baard
+        pygame.draw.circle(surface, BLACK, (x + PLAYER_WIDTH // 2, y + 8), 10) # Goggles
+        pygame.draw.circle(surface, (100, 200, 255), (x + PLAYER_WIDTH // 2, y + 8), 8)
+        
+        # Oude Jetpack en Vlammen logica
+        pygame.draw.rect(surface, RED, (x - 10, y + 10, 10, 30), border_radius=3)
+        pygame.draw.polygon(surface, WHITE, [(x - 10, y + 10), (x - 10, y + 40), (x - 20, y + 25)]) 
+        
+        if thrusting:
+            flame_height = random.randint(15, 25)
+            flame_width = random.randint(10, 20)
+            flame_points = [
+                (x - 5, y + 40), (x - 5 - flame_width // 2, y + 40 + flame_height // 2),
+                (x - 5, y + 40 + flame_height), (x - 5 + flame_width // 2, y + 40 + flame_height // 2)
+            ]
+            pygame.draw.polygon(surface, RED, flame_points)
+            pygame.draw.polygon(surface, YELLOW, [(p[0], p[1]-3) for p in flame_points])
+            
+    # Draw Coin Magnet Aura (deze blijft hetzelfde)
     magnet_gadget = next((g for g in GADGETS if g['name'] == 'Coin Magnet'), None)
     if magnet_gadget and magnet_gadget['purchased']:
-        magnet_surface = pygame.Surface((magnet_gadget['magnet_range'] * 2, magnet_gadget['magnet_range'] * 2), pygame.SRCALPHA)
-        pygame.draw.circle(magnet_surface, (255, 255, 0, 50), (magnet_gadget['magnet_range'], magnet_gadget['magnet_range']), magnet_gadget['magnet_range'])
-        
-        SCREEN.blit(magnet_surface, (x + PLAYER_WIDTH // 2 - magnet_gadget['magnet_range'], y + PLAYER_HEIGHT // 2 - magnet_gadget['magnet_range']))
-
+        magnet_range = magnet_gadget['magnet_range']
+        magnet_surface = pygame.Surface((magnet_range * 2, magnet_range * 2), pygame.SRCALPHA)
+        pygame.draw.circle(magnet_surface, (0, 0, 0, 0), (magnet_range, magnet_range), magnet_range)
+        SCREEN.blit(magnet_surface, (x + PLAYER_WIDTH // 2 - magnet_range, y + PLAYER_HEIGHT // 2 - magnet_range))
 
 def draw_obstacle(surface, obstacle):
     x = int(obstacle['x'])
@@ -793,16 +883,12 @@ def main():
                 # --- Einde Achtergrond Tekenen ---
                 
                 # De verticale lijnen geven nu een gevoel van beweging
-                for i in range(SCREEN_WIDTH // 120 + 2):
-                    x_pos = (i * 120) - (int(distance * speed / 10) % 120)
-                    # Gebruik een donkere kleur voor de lijnen zodat ze opvallen tegen de achtergrond
-                    pygame.draw.line(SCREEN, (50, 50, 50), (x_pos, 0), (x_pos, SCREEN_HEIGHT), 1)
 
                 pygame.draw.rect(SCREEN, GRAY_CEILING, (0, 0, SCREEN_WIDTH, 16))
                 pygame.draw.rect(SCREEN, (100, 100, 100), (0, 0, SCREEN_WIDTH, 16), 4)
                 pygame.draw.rect(SCREEN, GRAY_FLOOR, (0, SCREEN_HEIGHT - 16, SCREEN_WIDTH, 16))
                 pygame.draw.rect(SCREEN, (100, 100, 100), (0, SCREEN_HEIGHT - 16, SCREEN_WIDTH, 16), 4)
-                
+                    
                 for obs in obstacles:
                     draw_obstacle(SCREEN, obs)
                     
@@ -812,7 +898,7 @@ def main():
                 draw_player(SCREEN, PLAYER_START_X, player_y, is_thrusting)
                 draw_hud(SCREEN, int(score), coins, distance)
 
-                if distance < 5 and not game_over:
+                if distance < 3 and not game_over:
                     instr_text = font_large.render("HOLD MOUSE/SPACE TO FLY!", True, WHITE)
                     instr_bg = pygame.Rect(SCREEN_WIDTH//2 - instr_text.get_width()//2 - 20, 
                                             SCREEN_HEIGHT//2 - instr_text.get_height()//2 - 20, 
