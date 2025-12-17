@@ -2,7 +2,7 @@ import pygame
 import random
 import sys
 
-from Achtergrond import 
+import Achtergrond
 import coins
 import hitboxes
 import menu

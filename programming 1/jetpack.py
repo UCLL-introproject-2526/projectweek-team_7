@@ -42,11 +42,11 @@ start_background_music()
 # --- Game Constants ---
 SCREEN_WIDTH = 800
 SCREEN_HEIGHT = 600
-SCREEN = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-pygame.display.set_caption("Jetpack Joyride Pygame")
+SCREEN = pygame.display.set_mode(t_caption("Jetpack Joyride Pygame")
 
 # Colors
-WHITE = (255, 255, 255)
+WHITE = (255, 255, 255)(SCREEN_WIDTH, SCREEN_HEIGHT))
+pygame.display.se
 BLACK = (0, 0, 0)
 RED = (231, 76, 60)
 YELLOW = (241, 196, 15)

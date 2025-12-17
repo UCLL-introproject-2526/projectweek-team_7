@@ -2,6 +2,7 @@
 import sys
 import random
 import pygame
+import Startup
 
 from Startup import *
 from player_colors import WHITE, YELLOW, GRAY
@@ -10,11 +11,16 @@ from player import draw_player, apply_physics, PLAYER_W, PLAYER_H
 from obstacles import spawn_obstacle, draw_obstacle, move_obstacles
 from coins import spawn_coin, draw_coin, move_coins
 from hitboxes import player_rect, obstacle_rect, coin_rect, check_laser_collision
-from looper import update_background
 from menu import *
 from states import *
 from audio import *
 from load_highscore import *
+
+Startup.startup_loading_screen([
+    load_images,
+    load_audio,
+    load_fonts,
+])
 
 def check_collision(px, py, obstacles):
     p = player_rect(px, py)
@@ -159,7 +165,6 @@ def main():
 
         # Drawing
         if state["game_active"]:
-            update_background()
             draw_background()
 
             # Top + bottom bars

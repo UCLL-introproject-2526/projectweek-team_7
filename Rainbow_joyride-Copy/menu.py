@@ -4,24 +4,31 @@ import pygame
 from Startup import *
 from player_colors import *
 from Achtergrond import *
-from player import *
 from audio import *
 
-def draw_menu(coins_total, player_w, player_h):
-    draw_background()
+menu_background = pygame.image.load(
+    "projectweek-team_7\\Rainbow_joyride-Copy\\Background\\background\\menuschermpje.png"
+).convert()
 
-    title = font.render("RAINBOW RIDERS", True, YELLOW)
+menu_background = pygame.transform.scale(
+    menu_background, (WIDTH, HEIGHT)
+)
+
+def draw_menu(coins_total, player_w, player_h):
+    screen.blit(menu_background, (0, 0))
+
+
+    title = font.render(" ", True, YELLOW)
     screen.blit(title, (WIDTH // 2 - title.get_width() // 2, 100))
 
-    draw_player(WIDTH // 2 - player_w // 2, 200, False)
 
-    inst = font_small.render("Klik of druk SPATIE om te vliegen", True, WHITE)
+    inst = font_small.render(" ", True, WHITE)
     screen.blit(inst, (WIDTH // 2 - inst.get_width() // 2, 320))
 
-    button_rect = pygame.Rect(WIDTH // 2 - 100, 400, 200, 60)
+    button_rect = pygame.Rect(WIDTH // 2 - 100, 650, 200, 60)
     pygame.draw.rect(screen, GREEN, button_rect, border_radius=10)
     start_text = font.render("START", True, WHITE)
-    screen.blit(start_text, (WIDTH // 2 - start_text.get_width() // 2, 415))
+    screen.blit(start_text, (WIDTH // 2 - start_text.get_width() // 2, 663))
 
     coin_text = font_small.render(f"Munten: {coins_total}", True, YELLOW)
     screen.blit(coin_text, (20, 20))
