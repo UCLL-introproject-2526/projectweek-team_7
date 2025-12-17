@@ -2,17 +2,17 @@
 import random
 import pygame
 
-from Startup import screen, load_image, HEIGHT
-from player_colors import BLACK, YELLOW, RED
+from Startup import *
+from player_colors import *
 
 # Player image (pas pad aan)
-PLAYER_IMG_PATH = "Rainbow_joyride-Copy/Background/Player-images/avatar_zonder_vlam.png"
+PLAYER_IMG_PATH = "projectweek-team_7/Rainbow_joyride-Copy/Background/Player-images/avatar_zonder_vlam.png"
 PLAYER_SIZE = (60, 80)
 
 player_image, image_loaded = load_image(PLAYER_IMG_PATH, PLAYER_SIZE)
 
 # Player constants
-GRAVITY = 0.8
+GRAVITY = 0.6
 THRUST = -12
 
 PLAYER_W, PLAYER_H = PLAYER_SIZE

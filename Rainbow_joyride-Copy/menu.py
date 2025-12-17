@@ -1,10 +1,11 @@
 # menu.py
 import pygame
 
-from Startup import WIDTH, HEIGHT, screen, font, font_small
-from player_colors import YELLOW, WHITE, GREEN, BLUE, BLACK, RED
-from Achtergrond import draw_background
-from player import draw_player
+from Startup import *
+from player_colors import *
+from Achtergrond import *
+from player import *
+from audio import *
 
 def draw_menu(coins_total, player_w, player_h):
     draw_background()

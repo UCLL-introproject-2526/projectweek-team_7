@@ -2,8 +2,8 @@
 import random
 import pygame
 
-from Startup import WIDTH, HEIGHT, screen, font_small
-from player_colors import YELLOW, BLACK
+from Startup import *
+from player_colors import *
 
 def spawn_coin():
     return {"x": WIDTH, "y": random.randint(50, HEIGHT - 100)}

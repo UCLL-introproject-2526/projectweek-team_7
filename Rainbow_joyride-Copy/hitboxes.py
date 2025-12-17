@@ -1,7 +1,7 @@
 # hitboxes.py
 import pygame
-from Startup import HEIGHT
-from player import PLAYER_W, PLAYER_H
+from Startup import *
+from player import *
 
 def player_rect(px, py):
     # iets strakker voor collision

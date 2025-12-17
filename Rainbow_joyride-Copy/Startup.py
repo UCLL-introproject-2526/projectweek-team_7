@@ -3,6 +3,8 @@ import pygame
 
 pygame.init()
 
+
+pygame.mixer.init()
 # Constants
 WIDTH, HEIGHT = 800, 600
 FPS = 60

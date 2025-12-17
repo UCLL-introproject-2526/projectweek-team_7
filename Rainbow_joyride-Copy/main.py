@@ -3,20 +3,22 @@ import sys
 import random
 import pygame
 
-from Startup import WIDTH, HEIGHT, FPS, screen, clock, font_small
-from player_colors import WHITE, YELLOW, GRAY
-from Achtergrond import draw_background
-from player import draw_player, apply_physics, PLAYER_W, PLAYER_H
-from obstacles import spawn_obstacle, draw_obstacle, move_obstacles
-from coins import spawn_coin, draw_coin, move_coins
-from hitboxes import player_rect, obstacle_rect, coin_rect
-from menu import draw_menu, draw_game_over
-from states import reset_game
+from Startup import *
+from player_colors import *
+from Achtergrond import *
+from player import *
+from obstacles import *
+from coins import *
+from hitboxes import *
+from menu import *
+from states import *
+from audio import *
 
 def check_collision(px, py, obstacles):
     p = player_rect(px, py)
     for obs in obstacles:
         if p.colliderect(obstacle_rect(obs)):
+            game_over_sound()
             return True
     return False
 
@@ -26,6 +28,7 @@ def check_coin_collect(px, py, coin_items):
     to_remove = []
     for coin in coin_items:
         if p.colliderect(coin_rect(coin)):
+            coin_collect_sound()
             collected += 1
             to_remove.append(coin)
     for c in to_remove:
@@ -59,6 +62,7 @@ def main():
     start_button = None
 
     while running:
+
         dt = clock.tick(FPS) / 60.0  # (dt staat klaar als je het later wilt gebruiken)
 
         # Events
@@ -71,6 +75,7 @@ def main():
 
                 if not state["game_active"]:
                     if start_button and start_button.collidepoint(mouse_pos):
+                        start_background_music()
                         state["game_active"] = True
                         state["game_over"] = False
                         reset_game(state)
@@ -79,8 +84,10 @@ def main():
                     state["thrusting"] = True
 
                 elif state["game_over"]:
+                    stop_background_music()
                     retry, menu_btn = draw_game_over(state["score"], state["coins"])
                     if retry.collidepoint(mouse_pos):
+                        start_background_music()
                         state["game_over"] = False
                         reset_game(state)
                     elif menu_btn.collidepoint(mouse_pos):
