@@ -14,17 +14,18 @@ from looper import update_background
 from menu import *
 from states import *
 from audio import *
+from load_highscore import *
 
 def check_collision(px, py, obstacles):
     p = player_rect(px, py)
     for obs in obstacles:
-        # Check voor laser type
         if obs["type"] == "laser":
             if check_laser_collision(px, py, obs):
                 return True
         else:
             # Normale collision voor andere obstakels
             if p.colliderect(obstacle_rect(obs)):
+                game_over_sound()
                 return True
     return False
 
@@ -57,7 +58,7 @@ def main():
         "game_active": False,
         "game_over": False,
         "thrusting": False,
-
+        "highscore": load_highscore(),
         "score": 0.0,
         "coins": 0,
         "speed": 4.0,
@@ -109,9 +110,16 @@ def main():
                 if event.key == pygame.K_SPACE and state["game_active"] and not state["game_over"]:
                     state["thrusting"] = True
 
+                elif event.key == pygame.K_SPACE and state["game_over"]:
+                    start_background_music()
+                    state["game_over"] = False
+                    reset_game(state)
+
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
                     state["thrusting"] = False
+
+            
 
         # Game logic
         if state["game_active"] and not state["game_over"]:
@@ -135,6 +143,10 @@ def main():
             # Collisions
             if check_collision(state["player_x"], state["player_y"], state["obstacles"]):
                 state["game_over"] = True
+
+            if int(state["score"]) > state["highscore"]:
+                state["highscore"] = int(state["score"])
+                save_highscore(state["highscore"])
 
             gained = check_coin_collect(state["player_x"], state["player_y"], state["coin_items"])
             if gained:
@@ -164,8 +176,10 @@ def main():
 
             score_text = font_small.render(f"Score: {int(state['score'])}", True, WHITE)
             coin_text = font_small.render(f"Munten: {state['coins']}", True, YELLOW)
-            screen.blit(score_text, (10, 10))
-            screen.blit(coin_text, (10, 35))
+            highscore_text = font_small.render(f"Highscore: {state['highscore']}", True, WHITE)
+            screen.blit(highscore_text, (10, 10))
+            screen.blit(score_text, (10, 35))
+            screen.blit(coin_text, (10, 60))
 
             if state["game_over"]:
                 draw_game_over(state["score"], state["coins"])

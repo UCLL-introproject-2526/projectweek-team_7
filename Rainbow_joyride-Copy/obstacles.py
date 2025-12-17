@@ -8,18 +8,18 @@ from player_colors import RED, YELLOW, PURPLE
 def spawn_obstacle():
     obs_type = random.choice(["top", "bottom", "float", "laser"])
     if obs_type == "top":
-        return {"type": "top", "x": WIDTH, "h": random.randint(100, 250)}
+        return {"type": "top", "x": WIDTH, "h": random.randint(200, 350)}
     elif obs_type == "bottom":
-        return {"type": "bottom", "x": WIDTH, "h": random.randint(100, 250)}
+        return {"type": "bottom", "x": WIDTH, "h": random.randint(200, 350)}
     elif obs_type == "float":
-        return {"type": "float", "x": WIDTH, "y": random.randint(100, HEIGHT - 150), "s": random.randint(60, 100)}
+        return {"type": "float", "x": WIDTH, "y": random.randint(200, HEIGHT - 150), "s": random.randint(100, 150)}
     else:
         return {
             "type": "laser",
             "x": WIDTH,
-            "y": random.randint(150, HEIGHT - 150),
+            "y": random.randint(100, HEIGHT - 150),
             "angle": 0,
-            "length": 120,
+            "length": 170,
             "rotation_speed": random.choice([3, -3, 4, -4])
         }
 
