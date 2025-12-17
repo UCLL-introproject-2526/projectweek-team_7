@@ -4,12 +4,13 @@ import random
 import pygame
 
 from Startup import *
-from player_colors import *
+from player_colors import WHITE, YELLOW, GRAY
 from Achtergrond import *
-from player import *
-from obstacles import *
-from coins import *
-from hitboxes import *
+from player import draw_player, apply_physics, PLAYER_W, PLAYER_H
+from obstacles import spawn_obstacle, draw_obstacle, move_obstacles
+from coins import spawn_coin, draw_coin, move_coins
+from hitboxes import player_rect, obstacle_rect, coin_rect, check_laser_collision
+from looper import update_background
 from menu import *
 from states import *
 from audio import *
@@ -17,9 +18,14 @@ from audio import *
 def check_collision(px, py, obstacles):
     p = player_rect(px, py)
     for obs in obstacles:
-        if p.colliderect(obstacle_rect(obs)):
-            game_over_sound()
-            return True
+        # Check voor laser type
+        if obs["type"] == "laser":
+            if check_laser_collision(px, py, obs):
+                return True
+        else:
+            # Normale collision voor andere obstakels
+            if p.colliderect(obstacle_rect(obs)):
+                return True
     return False
 
 def check_coin_collect(px, py, coin_items):
@@ -34,6 +40,9 @@ def check_coin_collect(px, py, coin_items):
     for c in to_remove:
         coin_items.remove(c)
     return collected
+
+
+
 
 def main():
     # Game variables/state
@@ -62,8 +71,7 @@ def main():
     start_button = None
 
     while running:
-
-        dt = clock.tick(FPS) / 60.0  # (dt staat klaar als je het later wilt gebruiken)
+        dt = clock.tick(FPS) / 60.0
 
         # Events
         for event in pygame.event.get():
@@ -139,6 +147,7 @@ def main():
 
         # Drawing
         if state["game_active"]:
+            update_background()
             draw_background()
 
             # Top + bottom bars
@@ -162,6 +171,7 @@ def main():
                 draw_game_over(state["score"], state["coins"])
         else:
             start_button = draw_menu(state["coins"], PLAYER_W, PLAYER_H)
+
 
         pygame.display.flip()
 

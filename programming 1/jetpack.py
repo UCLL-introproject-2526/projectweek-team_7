@@ -61,11 +61,7 @@ BUTTON_GREEN = (76, 175, 80)
 try:
     # Probeer de achtergrondafbeelding te laden uit de map 'background'
     # Pas 'achtergrond.jpg' aan naar de daadwerkelijke naam van uw bestand
-<<<<<<< HEAD:test/programming 1/jetpack.py
-    BACKGROUND_IMAGE = pygame.image.load(r"test\programming 1\background\achtergrond.jpg").convert() 
-=======
     BACKGROUND_IMAGE = pygame.image.load('programming 1/background/achtergrond.jpg').convert() 
->>>>>>> 6079e424125df335879ca8ab12595b095600fb00:programming 1/jetpack.py
     # Schaal de afbeelding naar de schermgrootte
     BACKGROUND_IMAGE = pygame.transform.scale(BACKGROUND_IMAGE, (SCREEN_WIDTH, SCREEN_HEIGHT))
     background_loaded = True
