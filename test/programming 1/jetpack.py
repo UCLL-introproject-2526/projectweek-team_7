@@ -28,7 +28,7 @@ BUTTON_GREEN = (76, 175, 80)
 try:
     # Probeer de achtergrondafbeelding te laden uit de map 'background'
     # Pas 'achtergrond.jpg' aan naar de daadwerkelijke naam van uw bestand
-    BACKGROUND_IMAGE = pygame.image.load('background/achtergrond.jpg').convert() 
+    BACKGROUND_IMAGE = pygame.image.load(r"test\programming 1\background\achtergrond.jpg").convert() 
     # Schaal de afbeelding naar de schermgrootte
     BACKGROUND_IMAGE = pygame.transform.scale(BACKGROUND_IMAGE, (SCREEN_WIDTH, SCREEN_HEIGHT))
     background_loaded = True
@@ -76,7 +76,7 @@ MAX_VELOCITY = 36 # Slight increase to accommodate higher forces
 
 # Timing for Spawning (in frames)
 # --- ADJUSTED: Reduced spawn rate for more obstacles ---
-OBSTACLE_SPAWN_RATE = int(1.4 * FPS) # Reduced from 1.4 * FPS
+OBSTACLE_SPAWN_RATE = int(0.4 * FPS) # Reduced from 1.4 * FPS
 COIN_SPAWN_RATE = int(1.2 * FPS)
 obstacle_spawn_counter = OBSTACLE_SPAWN_RATE
 coin_spawn_counter = COIN_SPAWN_RATE
