@@ -7,7 +7,7 @@ from Achtergrond import *
 from audio import *
 
 menu_background = pygame.image.load(
-    "Rainbow_joyride-Copy\\Background\\background\\Rainbow.png"
+    "Rainbow_Riders\\Background\\background\\Rainbow.png"
 ).convert()
 
 menu_background = pygame.transform.scale(
@@ -35,23 +35,26 @@ def draw_menu(coins_total, player_w, player_h):
 
     return button_rect
 
-def draw_game_over(score, coins_total):
+def draw_game_over(highscore, score, coins_total):
     overlay = pygame.Surface((WIDTH, HEIGHT))
     overlay.set_alpha(180)
     overlay.fill(BLACK)
     screen.blit(overlay, (0, 0))
 
-    go_text = font.render("GAME OVER!", True, RED)
-    screen.blit(go_text, (WIDTH // 2 - go_text.get_width() // 2, 150))
+    go_text = font_big.render("GAME OVER", True, RED)
+    screen.blit(go_text, (WIDTH // 2 - go_text.get_width() // 2, 170))
+
+    highscore_text = font.render(f"Highscore: {int(highscore)}", True, WHITE)
+    screen.blit(highscore_text, (WIDTH // 2 - highscore_text.get_width() // 2, 300))
 
     score_text = font.render(f"Score: {int(score)}", True, WHITE)
-    screen.blit(score_text, (WIDTH // 2 - score_text.get_width() // 2, 220))
+    screen.blit(score_text, (WIDTH // 2 - score_text.get_width() // 2, 350))
 
     coin_text = font.render(f"Munten: {coins_total}", True, YELLOW)
-    screen.blit(coin_text, (WIDTH // 2 - coin_text.get_width() // 2, 270))
+    screen.blit(coin_text, (WIDTH // 2 - coin_text.get_width() // 2, 400))
 
-    retry_rect = pygame.Rect(WIDTH // 2 - 150, 350, 120, 50)
-    menu_rect = pygame.Rect(WIDTH // 2 + 30, 350, 120, 50)
+    retry_rect = pygame.Rect(WIDTH // 2 - 150, 500, 120, 50)
+    menu_rect = pygame.Rect(WIDTH // 2 + 30, 500, 120, 50)
 
     pygame.draw.rect(screen, GREEN, retry_rect, border_radius=5)
     pygame.draw.rect(screen, BLUE, menu_rect, border_radius=5)

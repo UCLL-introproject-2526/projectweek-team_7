@@ -21,34 +21,7 @@ startup_loading_screen([
     load_audio,
     load_fonts,
 ])
-
-def check_collision(px, py, obstacles):
-    p = player_rect(px, py)
-    for obs in obstacles:
-        if obs["type"] == "laser":
-            if check_laser_collision(px, py, obs):
-                return True
-        else:
-            # Normale collision voor andere obstakels
-            if p.colliderect(obstacle_rect(obs)):
-                game_over_sound()
-                return True
-    return False
-
-def check_coin_collect(px, py, coin_items):
-    p = pygame.Rect(px, py, PLAYER_W, PLAYER_H)
-    collected = 0
-    to_remove = []
-    for coin in coin_items:
-        if p.colliderect(coin_rect(coin)):
-            coin_collect_sound()
-            collected += 1
-            to_remove.append(coin)
-    for c in to_remove:
-        coin_items.remove(c)
-    return collected
-
-
+                
 
 def main():
     # Game variables/state
@@ -102,7 +75,7 @@ def main():
 
                 elif state["game_over"]:
                     stop_background_music()
-                    retry, menu_btn = draw_game_over(state["score"], state["coins"])
+                    retry, menu_btn = draw_game_over(state["highscore"], state["score"], state["coins"])
                     if retry.collidepoint(mouse_pos):
                         start_background_music()
                         state["game_over"] = False
@@ -119,16 +92,19 @@ def main():
                     state["thrusting"] = True
 
                 elif event.key == pygame.K_SPACE and state["game_over"]:
-                    start_background_music()
                     state["game_over"] = False
                     reset_game(state)
 
             if event.type == pygame.KEYUP:
                 if event.key == pygame.K_SPACE:
                     state["thrusting"] = False
+                    if not state["game_active"] and not state["game_over"]:
+                        start_background_music()
+                        state["game_active"] = True
+                        state["game_over"] = False
+                        reset_game(state)
 
-            
-
+                    
         # Game logic
         if state["game_active"] and not state["game_over"]:
             state["player_y"], state["player_vel"] = apply_physics(
@@ -202,7 +178,7 @@ def main():
                         screen.blit(new_hs_text, (10, 85))
 
             if state["game_over"]:
-                draw_game_over(state["score"], state["coins"])
+                draw_game_over(state["highscore"], state["score"], state["coins"])
         else:
             start_button = draw_menu(state["coins"], PLAYER_W, PLAYER_H)
 
