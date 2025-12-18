@@ -2,7 +2,6 @@
 import sys
 import random
 import pygame
-import Startup
 
 from Startup import *
 from player_colors import *
@@ -17,7 +16,7 @@ from audio import *
 from load_highscore import *
 import time
 
-Startup.startup_loading_screen([
+startup_loading_screen([
     load_images,
     load_audio,
     load_fonts,
