@@ -16,14 +16,46 @@ except pygame.error:
     float_image = None
     print("Warning: 'float_obstacle.png' niet gevonden, gebruik fallback rechthoeken")
 
+# Tracking voor recent gespawnde obstakels
+recent_spawns = []
+MAX_SAME_TYPE = 3
+MAX_SAME_POSITION = 3
+
 def spawn_obstacle():
+    global recent_spawns
+    
+    # Kies een random obstacle type
     obs_type = random.choice(
         ["rainbow", "rainbow", "rainbow", "laser", "float"]
     )
+    
+    # Tel hoeveel van hetzelfde type recent gespawnt zijn
+    type_count = sum(1 for spawn in recent_spawns if spawn["type"] == obs_type)
+    
+    # Als we al 3 van hetzelfde type hebben, kies een ander type
+    if type_count >= MAX_SAME_TYPE:
+        available_types = []
+        for test_type in ["rainbow", "laser", "float"]:
+            test_count = sum(1 for spawn in recent_spawns if spawn["type"] == test_type)
+            if test_count < MAX_SAME_TYPE:
+                available_types.append(test_type)
+        
+        if available_types:
+            obs_type = random.choice(available_types)
 
     if obs_type == "rainbow":
+        # Kies een positie
         position = random.choice(["top", "bottom"])
-        return {
+        
+        # Tel hoeveel rainbow obstacles met dezelfde positie recent gespawnt zijn
+        position_count = sum(1 for spawn in recent_spawns 
+                           if spawn["type"] == "rainbow" and spawn.get("position") == position)
+        
+        # Als we al 3 van dezelfde positie hebben, gebruik de andere positie
+        if position_count >= MAX_SAME_POSITION:
+            position = "bottom" if position == "top" else "top"
+        
+        obstacle = {
             "type": "rainbow",
             "x": WIDTH,
             "h": random.randint(200, 350),
@@ -31,7 +63,7 @@ def spawn_obstacle():
         }
 
     elif obs_type == "float":
-        return {
+        obstacle = {
             "type": "float",
             "x": WIDTH,
             "y": random.randint(200, HEIGHT - 150),
@@ -39,7 +71,7 @@ def spawn_obstacle():
         }
 
     else:  # laser
-        return {
+        obstacle = {
             "type": "laser",
             "x": WIDTH,
             "y": random.randint(100, HEIGHT - 150),
@@ -47,6 +79,15 @@ def spawn_obstacle():
             "length": 170,
             "rotation_speed": random.choice([3, -3, 4, -4])
         }
+    
+    # Voeg obstacle toe aan recent_spawns tracking
+    recent_spawns.append(obstacle.copy())
+    
+    # Houd alleen de laatste 3 spawns bij
+    if len(recent_spawns) > 3:
+        recent_spawns.pop(0)
+    
+    return obstacle
 
     
 
