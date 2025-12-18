@@ -7,7 +7,7 @@ from Achtergrond import *
 from audio import *
 
 menu_background = pygame.image.load(
-    "projectweek-team_7\\Rainbow_joyride-Copy\\Background\\background\\menuschermpje.png"
+    "Rainbow_joyride-Copy\\Background\\background\\menuschermpje.png"
 ).convert()
 
 menu_background = pygame.transform.scale(
@@ -25,10 +25,10 @@ def draw_menu(coins_total, player_w, player_h):
     inst = font_small.render(" ", True, WHITE)
     screen.blit(inst, (WIDTH // 2 - inst.get_width() // 2, 320))
 
-    button_rect = pygame.Rect(WIDTH // 2 - 100, 650, 200, 60)
+    button_rect = pygame.Rect(WIDTH // 2 - 100, 473, 200, 60)
     pygame.draw.rect(screen, GREEN, button_rect, border_radius=10)
     start_text = font.render("START", True, WHITE)
-    screen.blit(start_text, (WIDTH // 2 - start_text.get_width() // 2, 663))
+    screen.blit(start_text, (WIDTH // 2 - start_text.get_width() // 2, 485))
 
     coin_text = font_small.render(f"Munten: {coins_total}", True, YELLOW)
     screen.blit(coin_text, (20, 20))
