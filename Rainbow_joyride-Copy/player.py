@@ -55,11 +55,11 @@ def apply_physics(player_y, player_vel, thrusting):
     player_y += player_vel
 
     # Boundaries
-    if player_y < 20:
-        player_y = 20
+    if player_y < 10:
+        player_y = 10
         player_vel = 0
-    if player_y > HEIGHT - PLAYER_H - 20:
-        player_y = HEIGHT - PLAYER_H - 20
+    if player_y > HEIGHT - PLAYER_H - 10:
+        player_y = HEIGHT - PLAYER_H - 10
         player_vel = 0
 
     return player_y, player_vel
