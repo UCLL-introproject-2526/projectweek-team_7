@@ -9,4 +9,4 @@ def reset_game(state):
     state["coin_items"].clear()
     state["spawn_timer"] = 0
     state["new_highscore"] = False
-    state["highscore_time"] = 0  # 
+    state["highscore_time"] = 0  
