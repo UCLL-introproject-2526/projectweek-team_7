@@ -61,11 +61,6 @@ def startup_loading_screen(load_functions):
         else:
             screen.fill((10, 10, 30))
 
-        title = font.render("RAINBOW RIDERS", True, (255, 255, 255))
-        screen.blit(
-            title, (WIDTH // 2 - title.get_width() // 2, HEIGHT // 2 - 120)
-        )
-
         draw_loading_bar(min(progress, elapsed / MIN_LOADING_TIME))
         pygame.display.flip()
 
