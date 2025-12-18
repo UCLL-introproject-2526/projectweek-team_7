@@ -143,7 +143,7 @@ def main():
 
             # Score + speed
             state["score"] += 0.1
-            state["speed"] = min(5 + state["score"] / 200, 10)
+            state["speed"] = 5 + state["score"] / 150
 
         # Drawing
         if state["game_active"]:
