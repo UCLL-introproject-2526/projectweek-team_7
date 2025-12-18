@@ -1,4 +1,3 @@
-# Startup.py
 import pygame
 
 pygame.init()

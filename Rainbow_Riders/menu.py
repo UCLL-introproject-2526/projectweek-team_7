@@ -62,6 +62,7 @@ def draw_game_over(highscore, score, coins_total):
     retry_text = font_small.render("OPNIEUW", True, WHITE)
     menu_text = font_small.render("MENU", True, WHITE)
 
+    # centreert text horizontaal binnen rechthoek en plaatst het iets boven het midden verticaal
     screen.blit(retry_text, (retry_rect.centerx - retry_text.get_width() // 2, retry_rect.centery - 10))
     screen.blit(menu_text, (menu_rect.centerx - menu_text.get_width() // 2, menu_rect.centery - 10))
 

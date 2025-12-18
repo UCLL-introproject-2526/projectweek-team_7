@@ -2,6 +2,7 @@
 import sys
 import random
 import pygame
+import time
 
 from Startup import *
 from player_colors import *
@@ -14,25 +15,22 @@ from menu import *
 from states import *
 from audio import *
 from load_highscore import *
-import time
 
+# Laadt alle assets (afbeeldingen, geluiden, fonts) met een laadscherm
 startup_loading_screen([
     load_images,
     load_audio,
     load_fonts,
 ])
-                
 
 def main():
-    # Game variables/state
+    # === GAME STATE ===
     state = {
         "WIDTH": WIDTH,
         "HEIGHT": HEIGHT,
-
         "player_x": 100,
         "player_y": HEIGHT - 150,
         "player_vel": 0,
-
         "game_active": False,
         "game_over": False,
         "thrusting": False,
@@ -40,22 +38,23 @@ def main():
         "score": 0.0,
         "coins": 0,
         "speed": 4.0,
-
         "obstacles": [],
         "coin_items": [],
         "spawn_timer": 0,
-        "new_highscore": False,  
-        "highscore_shown": False,
+
+        # 🔥 Highscore melding
+        "new_highscore": False,
         "highscore_time": 0
     }
 
     running = True
     start_button = None
 
+    # === MAIN GAME LOOP ===
     while running:
         dt = clock.tick(FPS) / 60.0
 
-        # Events
+        # === EVENT HANDLING ===
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 running = False
@@ -75,7 +74,11 @@ def main():
 
                 elif state["game_over"]:
                     stop_background_music()
-                    retry, menu_btn = draw_game_over(state["highscore"], state["score"], state["coins"])
+                    retry, menu_btn = draw_game_over(
+                        state["highscore"],
+                        state["score"],
+                        state["coins"]
+                    )
                     if retry.collidepoint(mouse_pos):
                         start_background_music()
                         state["game_over"] = False
@@ -90,7 +93,6 @@ def main():
             if event.type == pygame.KEYDOWN:
                 if event.key == pygame.K_SPACE and state["game_active"] and not state["game_over"]:
                     state["thrusting"] = True
-
                 elif event.key == pygame.K_SPACE and state["game_over"]:
                     state["game_over"] = False
                     reset_game(state)
@@ -104,84 +106,112 @@ def main():
                         state["game_over"] = False
                         reset_game(state)
 
-                    
-        # Game logic
+        # === GAME LOGIC ===
         if state["game_active"] and not state["game_over"]:
+            # Speler fysica
             state["player_y"], state["player_vel"] = apply_physics(
-                state["player_y"], state["player_vel"], state["thrusting"]
+                state["player_y"],
+                state["player_vel"],
+                state["thrusting"]
             )
 
-            # Spawn obstacles + coins
+            # Obstakels spawnen
             state["spawn_timer"] += 1.05
             if state["spawn_timer"] > 60:
                 state["obstacles"].append(spawn_obstacle())
                 state["spawn_timer"] = 0
 
+            # Munten spawnen
             if random.random() < 0.02:
                 state["coin_items"].append(spawn_coin())
 
-            # Move
+            # Beweging
             state["obstacles"] = move_obstacles(state["obstacles"], state["speed"])
             state["coin_items"] = move_coins(state["coin_items"], state["speed"])
 
-            
-            # Collisions
-            if check_collision(state["player_x"], state["player_y"], state["obstacles"]):
-                state["game_over"] = True
-
-            if int(state["score"]) > state["highscore"]:
-                if not state["new_highscore"]:  
-                    state["new_highscore"] = True
-                    state["highscore_time"] = time.time()  
-                state["highscore"] = int(state["score"])
-                save_highscore(state["highscore"])
-
-            gained = check_coin_collect(state["player_x"], state["player_y"], state["coin_items"])
+            # Munten verzamelen
+            gained = check_coin_collect(
+                state["player_x"],
+                state["player_y"],
+                state["coin_items"]
+            )
             if gained:
                 state["coins"] += gained
                 state["score"] += gained * 10
 
-            # Score + speed
+            # Score & snelheid
             state["score"] += 0.1
             state["speed"] = 5 + state["score"] / 150
 
-        # Drawing
+            # NIEUWE HIGHSCORE CHECK (TIJDENS HET SPELEN)
+            if int(state["score"]) > state["highscore"]:
+                state["highscore"] = int(state["score"])
+                save_highscore(state["highscore"])
+
+                # Slechts 1x per run triggeren
+                if not state["new_highscore"]:
+                    state["new_highscore"] = True
+                    state["highscore_time"] = time.time()
+
+            # Botsing (GEEN highscore-logica meer hier!)
+            if check_collision(
+                state["player_x"],
+                state["player_y"],
+                state["obstacles"]
+            ):
+                state["game_over"] = True
+
+        # === DRAWING ===
         if state["game_active"]:
             draw_background()
 
-            # Top + bottom bars
             pygame.draw.rect(screen, GRAY, (0, 0, WIDTH, 20))
             pygame.draw.rect(screen, GRAY, (0, HEIGHT - 20, WIDTH, 20))
 
-            # Objects
             for obs in state["obstacles"]:
                 draw_obstacle(obs)
             for coin in state["coin_items"]:
                 draw_coin(coin)
 
-            draw_player(state["player_x"], state["player_y"], state["thrusting"])
+            draw_player(
+                state["player_x"],
+                state["player_y"],
+                state["thrusting"]
+            )
 
-            score_text = font_small.render(f"Score: {int(state['score'])}", True, WHITE)
-            coin_text = font_small.render(f"Munten: {state['coins']}", True, YELLOW)
-            highscore_text = font_small.render(f"Highscore: {state['highscore']}", True, WHITE)
-            screen.blit(highscore_text, (10, 10))
-            screen.blit(score_text, (10, 35))
-            screen.blit(coin_text, (10, 60))
+            # UI
+            screen.blit(
+                font_small.render(f"Highscore: {state['highscore']}", True, WHITE),
+                (10, 10)
+            )
+            screen.blit(
+                font_small.render(f"Score: {int(state['score'])}", True, WHITE),
+                (10, 35)
+            )
+            screen.blit(
+                font_small.render(f"Munten: {state['coins']}", True, YELLOW),
+                (10, 60)
+            )
 
-
+            # NEW HIGHSCORE MELDING (5 seconden, ook bij game over)
             if state["new_highscore"] and not state["game_over"]:
-                # Check of er minder dan 5 seconden verstreken zijn
-                if time.time() - state["highscore_time"] < 5:  
-                    # Knipperend effect
-                    if int(time.time() * 3) % 2 == 0:  # Knippert 3x per seconde
-                        new_hs_text = font_small.render("NEW HIGHSCORE!", True, (255, 215, 0))
-                        screen.blit(new_hs_text, (10, 85))
+                if time.time() - state["highscore_time"] < 5:
+                    if int(time.time() * 3) % 2 == 0:
+                        text = font_small.render(
+                            "NEW HIGHSCORE!",
+                            True,
+                            (255, 215, 0)
+                        )
+                        screen.blit(text, (10, 85))
 
             if state["game_over"]:
-                draw_game_over(state["highscore"], state["score"], state["coins"])
+                draw_game_over(
+                    state["highscore"],
+                    state["score"],
+                    state["coins"]
+                )
         else:
             start_button = draw_menu(state["coins"], PLAYER_W, PLAYER_H)
-
 
         pygame.display.flip()
 

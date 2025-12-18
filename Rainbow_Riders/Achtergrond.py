@@ -1,5 +1,3 @@
-# Achtergrond.py
-import pygame
 from Startup import *
 from player_colors import *
 

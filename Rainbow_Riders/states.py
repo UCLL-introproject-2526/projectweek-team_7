@@ -1,5 +1,3 @@
-# states.py
-
 def reset_game(state):
     state["player_y"] = state["HEIGHT"] - 150
     state["player_vel"] = 0

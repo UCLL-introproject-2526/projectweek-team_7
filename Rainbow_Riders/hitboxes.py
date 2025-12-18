@@ -1,4 +1,3 @@
-# hitboxes.py
 import pygame
 import math
 from audio import *

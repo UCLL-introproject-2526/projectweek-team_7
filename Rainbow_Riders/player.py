@@ -1,11 +1,9 @@
-# player.py
 import random
 import pygame
 
 from Startup import *
 from player_colors import *
 
-# Player image (pas pad aan)
 PLAYER_IMG_PATH = "Rainbow_Riders\\Background\Player-images\\avatar_zonder_vlam.png"
 PLAYER_SIZE = (60, 80)
 
@@ -18,13 +16,13 @@ THRUST = -12
 PLAYER_W, PLAYER_H = PLAYER_SIZE
 
 def draw_player_fallback(x, y, thrusting):
-    # Body
+    # lichaam
     pygame.draw.rect(screen, (139, 69, 19), (x, y, 40, 60), border_radius=5)
-    # Head
+    # hoofd
     pygame.draw.circle(screen, (255, 200, 150), (x + 20, y - 10), 15)
-    # Goggles
+    # bril
     pygame.draw.circle(screen, BLACK, (x + 20, y - 10), 8)
-    # Flames
+    # vlammen
     if thrusting:
         flame_y = y + 60
         for i in range(3):
@@ -54,7 +52,7 @@ def apply_physics(player_y, player_vel, thrusting):
     player_vel = max(-15, min(15, player_vel))
     player_y += player_vel
 
-    # Boundaries
+    # grenzen
     if player_y < 10:
         player_y = 10
         player_vel = 0

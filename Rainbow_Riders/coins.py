@@ -1,4 +1,3 @@
-# coins.py
 import random
 import pygame
 
