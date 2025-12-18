@@ -18,8 +18,9 @@ except pygame.error:
 
 # Tracking voor recent gespawnde obstakels
 recent_spawns = []
-MAX_SAME_TYPE = 3
-MAX_SAME_POSITION = 3
+MAX_SAME_TYPE = 2
+MAX_SAME_TYPE_RAINBOW = 3
+MAX_SAME_POSITION = 2
 
 def spawn_obstacle():
     global recent_spawns
@@ -32,16 +33,22 @@ def spawn_obstacle():
     # Tel hoeveel van hetzelfde type recent gespawnt zijn
     type_count = sum(1 for spawn in recent_spawns if spawn["type"] == obs_type)
     
-    # Als we al 3 van hetzelfde type hebben, kies een ander type
-    if type_count >= MAX_SAME_TYPE:
-        available_types = []
-        for test_type in ["rainbow", "laser", "float"]:
-            test_count = sum(1 for spawn in recent_spawns if spawn["type"] == test_type)
-            if test_count < MAX_SAME_TYPE:
-                available_types.append(test_type)
-        
+    # <Indien het obstakel niet van het type regenboog is en we al 2 van hetzelfde type hebben, kies een ander type
+    # Bepaal de juiste limiet op basis van het type
+    max_limit = MAX_SAME_TYPE_RAINBOW if obs_type == "rainbow" else MAX_SAME_TYPE
+
+# Controleer of we de limiet hebben bereikt
+    if type_count >= max_limit:
+        available_types = [
+        test_type for test_type in ["rainbow", "laser", "float"]
+        if sum(1 for spawn in recent_spawns if spawn["type"] == test_type) < MAX_SAME_TYPE
+    ]
+    
         if available_types:
             obs_type = random.choice(available_types)
+
+                
+
 
     if obs_type == "rainbow":
         # Kies een positie
