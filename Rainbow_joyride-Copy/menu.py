@@ -7,7 +7,7 @@ from Achtergrond import *
 from audio import *
 
 menu_background = pygame.image.load(
-    "Rainbow_joyride-Copy\\Background\\background\\menuschermpje.png"
+    "Rainbow_joyride-Copy\\Background\\background\\Rainbow.png"
 ).convert()
 
 menu_background = pygame.transform.scale(

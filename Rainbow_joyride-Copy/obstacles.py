@@ -8,9 +8,9 @@ from player_colors import RED, YELLOW, PURPLE
 def spawn_obstacle():
     obs_type = random.choice(["top", "bottom", "float", "laser"])
     if obs_type == "top":
-        return {"type": "top", "x": WIDTH, "h": random.randint(200, 350)}
+        return {"type": "top", "x": WIDTH, "h": random.randint(180, 300)}
     elif obs_type == "bottom":
-        return {"type": "bottom", "x": WIDTH, "h": random.randint(200, 350)}
+        return {"type": "bottom", "x": WIDTH, "h": random.randint(180, 300)}
     elif obs_type == "float":
         return {"type": "float", "x": WIDTH, "y": random.randint(200, HEIGHT - 150), "s": random.randint(100, 150)}
     else:

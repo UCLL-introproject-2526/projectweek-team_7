@@ -51,7 +51,6 @@ def check_coin_collect(px, py, coin_items):
 
 
 
-
 def main():
     # Game variables/state
     state = {
