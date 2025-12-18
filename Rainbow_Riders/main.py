@@ -130,9 +130,9 @@ def main():
                 state["game_over"] = True
 
             if int(state["score"]) > state["highscore"]:
-                if not state["new_highscore"]:  # <-- Alleen de eerste keer
+                if not state["new_highscore"]:  
                     state["new_highscore"] = True
-                    state["highscore_time"] = time.time()  # <-- NIEUW: sla tijd op
+                    state["highscore_time"] = time.time()  
                 state["highscore"] = int(state["score"])
                 save_highscore(state["highscore"])
 
@@ -171,7 +171,7 @@ def main():
 
             if state["new_highscore"] and not state["game_over"]:
                 # Check of er minder dan 5 seconden verstreken zijn
-                if time.time() - state["highscore_time"] < 5:  # <-- NIEUW
+                if time.time() - state["highscore_time"] < 5:  
                     # Knipperend effect
                     if int(time.time() * 3) % 2 == 0:  # Knippert 3x per seconde
                         new_hs_text = font_small.render("NEW HIGHSCORE!", True, (255, 215, 0))

@@ -4,7 +4,6 @@ def load_highscore():
         with open("highscore.txt", "r") as f:
             return int(f.read())
     except:
-        # Als bestand niet bestaat of fout is
         return 0
 
 
