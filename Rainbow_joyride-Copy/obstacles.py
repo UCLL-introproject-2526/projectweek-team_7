@@ -41,7 +41,7 @@ def draw_obstacle(obs):
         # Centrum van de laser
         center_x = obs["x"] + 25
         center_y = obs["y"]
-        pygame.draw.circle(screen, (50, 110, 150), (int(center_x), int(center_y)), 15)
+        pygame.draw.circle(screen, (0, 170, 255), (int(center_x), int(center_y)), 15)
         
         # Bereken eindpunt van de laser
         rad = math.radians(obs["angle"])
@@ -49,8 +49,8 @@ def draw_obstacle(obs):
         end_y = center_y + math.sin(rad) * obs["length"]
         
         # Teken laser straal
-        pygame.draw.line(screen, (50, 110, 150), (center_x, center_y), (end_x, end_y), 5)
-        pygame.draw.line(screen, (50, 110, 150), (center_x, center_y), (end_x, end_y), 2)
+        pygame.draw.line(screen, (0, 170, 255), (center_x, center_y), (end_x, end_y), 5)
+        pygame.draw.line(screen, (0, 170, 255), (center_x, center_y), (end_x, end_y), 2)
 
 def move_obstacles(obstacles, speed):
     for obs in obstacles:
