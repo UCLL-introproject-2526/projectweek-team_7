@@ -5,16 +5,17 @@ import pygame
 import Startup
 
 from Startup import *
-from player_colors import WHITE, YELLOW, GRAY
+from player_colors import *
 from Achtergrond import *
-from player import draw_player, apply_physics, PLAYER_W, PLAYER_H
-from obstacles import spawn_obstacle, draw_obstacle, move_obstacles
-from coins import spawn_coin, draw_coin, move_coins
-from hitboxes import player_rect, obstacle_rect, coin_rect, check_laser_collision
+from player import *
+from obstacles import *
+from coins import *
+from hitboxes import *
 from menu import *
 from states import *
 from audio import *
 from load_highscore import *
+import time
 
 Startup.startup_loading_screen([
     load_images,
@@ -72,6 +73,9 @@ def main():
         "obstacles": [],
         "coin_items": [],
         "spawn_timer": 0,
+        "new_highscore": False,  
+        "highscore_shown": False,
+        "highscore_time": 0
     }
 
     running = True
@@ -146,11 +150,15 @@ def main():
             state["obstacles"] = move_obstacles(state["obstacles"], state["speed"])
             state["coin_items"] = move_coins(state["coin_items"], state["speed"])
 
+            
             # Collisions
             if check_collision(state["player_x"], state["player_y"], state["obstacles"]):
                 state["game_over"] = True
 
             if int(state["score"]) > state["highscore"]:
+                if not state["new_highscore"]:  # <-- Alleen de eerste keer
+                    state["new_highscore"] = True
+                    state["highscore_time"] = time.time()  # <-- NIEUW: sla tijd op
                 state["highscore"] = int(state["score"])
                 save_highscore(state["highscore"])
 
@@ -185,6 +193,15 @@ def main():
             screen.blit(highscore_text, (10, 10))
             screen.blit(score_text, (10, 35))
             screen.blit(coin_text, (10, 60))
+
+
+            if state["new_highscore"] and not state["game_over"]:
+                # Check of er minder dan 5 seconden verstreken zijn
+                if time.time() - state["highscore_time"] < 5:  # <-- NIEUW
+                    # Knipperend effect
+                    if int(time.time() * 3) % 2 == 0:  # Knippert 3x per seconde
+                        new_hs_text = font_small.render("NEW HIGHSCORE!", True, (255, 215, 0))
+                        screen.blit(new_hs_text, (10, 85))
 
             if state["game_over"]:
                 draw_game_over(state["score"], state["coins"])
