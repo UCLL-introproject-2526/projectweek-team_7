@@ -3,7 +3,7 @@ import pygame
 from Startup import *
 from player_colors import *
 
-BACKGROUND_PATH = "projectweek-team_7\\Rainbow_joyride-Copy\\Background\\background\content.png"
+BACKGROUND_PATH = "Rainbow_joyride-Copy\\Background\\background\\background_image.png"
 BG_SPEED = 2
 background, bg_loaded = load_image(BACKGROUND_PATH, (WIDTH, HEIGHT))
 
