@@ -48,6 +48,7 @@ def check_laser_collision(px, py, obs):
         ly = center_y + math.sin(rad) * i
 
         if (px < lx < px + PLAYER_W and py < ly < py + PLAYER_H):
+            player_laser()
             return True
 
     return False

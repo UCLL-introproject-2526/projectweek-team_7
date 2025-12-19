@@ -40,3 +40,14 @@ def stop_background_music():
     pygame.mixer.stop()
 
 
+def player_laser():
+    player_laser_FILE = 'Rainbow_Riders\\Assets\\audio\\player_laser.wav'
+    
+    try:
+        player_laser = pygame.mixer.Sound(player_laser_FILE)
+        player_laser.play()
+        player_laser.set_volume(1.3)
+
+    except pygame.error as e:
+        print(f"Fout bij het laden of afspelen van geluidsbestand: {e}")
+        print("Controleer of het bestandspad en het formaat correct zijn.")
