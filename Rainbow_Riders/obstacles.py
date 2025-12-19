@@ -55,7 +55,7 @@ def spawn_obstacle():
         position_count = sum(1 for spawn in recent_spawns 
                            if spawn["type"] == "rainbow" and spawn.get("position") == position)
         
-        # Als we al 3 van dezelfde positie hebben, gebruik de andere positie
+        # Als we al 2 van dezelfde positie hebben, gebruik de andere positie
         if position_count >= MAX_SAME_POSITION:
             position = "bottom" if position == "top" else "top"
         
@@ -143,7 +143,7 @@ def draw_obstacle(obs):
             (70, 130, 180)    # Staalblauw (buitenste)
         ]
         num_arcs = 7
-        rainbow_width = 70  # Zelfde breedte als top/bottom obstacles
+        rainbow_width = 70  
     
         arc_thickness = rainbow_width // (num_arcs * 2)
         

@@ -42,7 +42,7 @@ def main():
         "coin_items": [],
         "spawn_timer": 0,
 
-        # 🔥 Highscore melding
+        # Highscore melding
         "new_highscore": False,
         "highscore_time": 0
     }
@@ -193,7 +193,7 @@ def main():
                 (10, 60)
             )
 
-            # NEW HIGHSCORE MELDING (5 seconden, ook bij game over)
+            # HIGHSCORE MELDING (5 seconden, ook bij game over)
             if state["new_highscore"] and not state["game_over"]:
                 if time.time() - state["highscore_time"] < 5:
                     if int(time.time() * 3) % 2 == 0:

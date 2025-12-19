@@ -4,7 +4,7 @@ import pygame
 from Startup import *
 from player_colors import *
 
-PLAYER_IMG_PATH = "Rainbow_Riders\\Background\Player-images\\avatar_zonder_vlam.png"
+PLAYER_IMG_PATH = "Rainbow_Riders\\Background\\Player-images\\avatar_zonder_vlam.png"
 PLAYER_SIZE = (60, 80)
 
 player_image, image_loaded = load_image(PLAYER_IMG_PATH, PLAYER_SIZE)
