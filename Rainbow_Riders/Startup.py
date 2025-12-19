@@ -70,14 +70,14 @@ def draw_loading_bar(progress):
     bar_width = 600
     bar_height = 30
     x = (WIDTH - bar_width) // 2
-    y = HEIGHT // 2
+    y = HEIGHT // 2 + 100
 
     pygame.draw.rect(screen, (60, 60, 60), (x, y, bar_width, bar_height))
     pygame.draw.rect(
         screen, (0, 200, 255), (x, y, int(bar_width * progress), bar_height)
     )
 
-    percent = font_small.render(f"{int(progress * 100)}%", True, (255, 255, 255))
+    percent = font_small.render(f"{int(progress * 100)}%", True, (200, 30, 130))
     screen.blit(percent, (x + bar_width // 2 - 10, y - 30))
 
 
