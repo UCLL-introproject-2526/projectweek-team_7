@@ -3,11 +3,11 @@ import pygame
 
 from Startup import *
 from player_colors import *
-from Achtergrond import *
+from achtergrond import *
 from audio import *
 
 menu_background = pygame.image.load(
-    "Rainbow_Riders\\Background\\background\\Rainbow.png"
+    "Rainbow_Riders\\Assets\\background\\menu_scherm.png"
 ).convert()
 
 menu_background = pygame.transform.scale(

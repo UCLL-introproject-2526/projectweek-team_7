@@ -6,7 +6,7 @@ import time
 
 from Startup import *
 from player_colors import *
-from Achtergrond import *
+from achtergrond import *
 from player import *
 from obstacles import *
 from coins import *
@@ -19,7 +19,6 @@ from load_highscore import *
 # Laadt alle assets (afbeeldingen, geluiden, fonts) met een laadscherm
 startup_loading_screen([
     load_images,
-    load_audio,
     load_fonts,
 ])
 

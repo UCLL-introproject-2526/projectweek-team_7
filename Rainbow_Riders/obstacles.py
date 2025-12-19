@@ -8,7 +8,7 @@ from player_colors import RED, YELLOW, PURPLE
 # Laad de afbeelding voor floating obstacles
 # Zorg dat je een afbeelding hebt in je project map (bijv. 'float_obstacle.png')
 try:
-    float_image = pygame.image.load("Rainbow_Riders\\Background\\background\\mimic_chest.png")
+    float_image = pygame.image.load("Rainbow_Riders\\Assets\\background\\mimic_chest.png")
     # Je kunt de afbeelding schalen naar de gewenste grootte
     # float_image = pygame.transform.scale(float_image, (100, 100))
 except pygame.error:

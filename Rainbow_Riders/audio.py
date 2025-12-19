@@ -3,7 +3,7 @@ import pygame
 pygame.mixer.init()
 
 def start_background_music():
-    MUSIC_FILE = 'Rainbow_Riders\\audio\\Cyberpunk_Moonlight_Sonata.mp3'
+    MUSIC_FILE = 'Rainbow_Riders\\Assets\\audio\\cyberpunk_moonlight_sonata.mp3'
     
     try:
         background_music = pygame.mixer.Sound(MUSIC_FILE)
@@ -15,7 +15,7 @@ def start_background_music():
         print("Controleer of het bestandspad en het formaat correct zijn.")
 
 def coin_collect_sound():
-    COIN_SOUND_FILE = 'Rainbow_Riders\\audio\\coin_collect.wav'
+    COIN_SOUND_FILE = 'Rainbow_Riders\\Assets\\audio\\coin_collect.wav'
     
     try:
         coin_sound = pygame.mixer.Sound(COIN_SOUND_FILE)
@@ -25,7 +25,7 @@ def coin_collect_sound():
         print("Controleer of het bestandspad en het formaat correct zijn.")
 
 def game_over_sound():
-    GAME_OVER_SOUND_FILE = 'Rainbow_Riders\\audio\\game_over.mp3'
+    GAME_OVER_SOUND_FILE = 'Rainbow_Riders\\Assets\\audio\\obstacle_hit.mp3'
     
     try:
         game_over_sound = pygame.mixer.Sound(GAME_OVER_SOUND_FILE)
@@ -38,3 +38,5 @@ def game_over_sound():
 
 def stop_background_music():
     pygame.mixer.stop()
+
+

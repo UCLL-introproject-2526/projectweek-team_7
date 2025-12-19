@@ -4,7 +4,7 @@ import pygame
 from Startup import *
 from player_colors import *
 
-PLAYER_IMG_PATH = "Rainbow_Riders\\Background\\Player-images\\avatar_zonder_vlam.png"
+PLAYER_IMG_PATH = "Rainbow_Riders\\Assets\\Player-images\\game_character.png"
 PLAYER_SIZE = (60, 80)
 
 player_image, image_loaded = load_image(PLAYER_IMG_PATH, PLAYER_SIZE)
@@ -49,7 +49,7 @@ def apply_physics(player_y, player_vel, thrusting):
     else:
         player_vel += GRAVITY
 
-    player_vel = max(-15, min(15, player_vel))
+    player_vel = max(-10.5, min(10.5, player_vel))
     player_y += player_vel
 
     # grenzen

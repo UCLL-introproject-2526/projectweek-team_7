@@ -85,13 +85,10 @@ def load_images():
     global loading_background
     # Laad de afbeelding en schaal deze naar de schermgrootte
     loading_background = pygame.image.load(
-        "Rainbow_Riders\\Background\\background\\loadingscreen.png"
+        "Rainbow_Riders\\Assets\\background\\loadingscreen.png"
     ).convert_alpha()
     loading_background = pygame.transform.scale(loading_background, (WIDTH, HEIGHT))
 
-
-def load_audio():
-    pygame.mixer.music.load("Rainbow_Riders\\audio\\replaceholder1.mp3")
 
 
 def load_fonts():

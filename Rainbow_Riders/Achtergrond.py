@@ -1,7 +1,7 @@
 from Startup import *
 from player_colors import *
 
-BACKGROUND_PATH = "Rainbow_Riders\\Background\\background\\background_image.png"
+BACKGROUND_PATH = "Rainbow_Riders\\Assets\\background\\background_image.png"
 BG_SPEED = 2
 background, bg_loaded = load_image(BACKGROUND_PATH, (WIDTH, HEIGHT))
 
