@@ -33,6 +33,7 @@ def main():
         "game_active": False,
         "game_over": False,
         "thrusting": False,
+        "jetpack_playing": False,
         "highscore": load_highscore(),
         "score": 0.0,
         "coins": 0,
@@ -53,6 +54,15 @@ def main():
     while running:
         dt = clock.tick(FPS) / 60.0
 
+        # In je game loop waar je thrusting controleert:
+        if state["thrusting"] == True:
+            if not state["jetpack_playing"]:  # Start alleen als niet al aan het spelen
+                audio_jetpack()
+                state["jetpack_playing"] = True
+        else:
+            if state["jetpack_playing"]:  # Stop alleen als aan het spelen
+                stop_audio_jetpack()
+                state["jetpack_playing"] = False
         # === EVENT HANDLING ===
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -70,6 +80,7 @@ def main():
 
                 elif state["game_active"] and not state["game_over"]:
                     state["thrusting"] = True
+                    
 
                 elif state["game_over"]:
                     stop_background_music()

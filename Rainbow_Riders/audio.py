@@ -2,6 +2,9 @@ import pygame
 
 pygame.mixer.init()
 
+# Globale variabele voor jetpack geluid
+jetpack_sound = None
+
 def start_background_music():
     MUSIC_FILE = 'Rainbow_Riders\\Assets\\audio\\cyberpunk_moonlight_sonata.mp3'
     
@@ -33,12 +36,11 @@ def game_over_sound():
         game_over_sound.set_volume(1.3)
 
     except pygame.error as e:
-        print(f"Fout bij het laden of afspelen van geluidsbestand: {e}")
+        print(f"Fout bij het laden or afspelen van geluidsbestand: {e}")
         print("Controleer of het bestandspad en het formaat correct zijn.")
 
 def stop_background_music():
     pygame.mixer.stop()
-
 
 def player_laser():
     player_laser_FILE = 'Rainbow_Riders\\Assets\\audio\\player_laser.wav'
@@ -51,3 +53,21 @@ def player_laser():
     except pygame.error as e:
         print(f"Fout bij het laden of afspelen van geluidsbestand: {e}")
         print("Controleer of het bestandspad en het formaat correct zijn.")
+
+def audio_jetpack():
+    global jetpack_sound
+    audio_jetpack_file = 'Rainbow_Riders\\Assets\\audio\\vuur_jetpack.wav'
+    
+    try:
+        jetpack_sound = pygame.mixer.Sound(audio_jetpack_file)
+        jetpack_sound.play()
+        jetpack_sound.set_volume(0.4)
+
+    except pygame.error as e:
+        print(f"Fout bij het laden of afspelen van geluidsbestand: {e}")
+        print("Controleer of het bestandspad en het formaat correct zijn.")
+
+def stop_audio_jetpack():
+    global jetpack_sound
+    if jetpack_sound:
+        jetpack_sound.stop()
