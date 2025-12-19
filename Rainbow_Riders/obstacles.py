@@ -47,9 +47,6 @@ def spawn_obstacle():
         if available_types:
             obs_type = random.choice(available_types)
 
-                
-
-
     if obs_type == "rainbow":
         # Kies een positie
         position = random.choice(["top", "bottom"])

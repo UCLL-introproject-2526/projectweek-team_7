@@ -137,13 +137,13 @@ def main():
             )
             if gained:
                 state["coins"] += gained
-                state["score"] += gained * 10
+                state["score"] += gained * 12
 
             # Score & snelheid
             state["score"] += 0.1
-            state["speed"] = 5 + state["score"] / 150
+            state["speed"] = 5 + state["score"] / 100
 
-            # NIEUWE HIGHSCORE CHECK (TIJDENS HET SPELEN)
+            # highscorescheck
             if int(state["score"]) > state["highscore"]:
                 state["highscore"] = int(state["score"])
                 save_highscore(state["highscore"])
