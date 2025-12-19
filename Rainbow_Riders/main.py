@@ -116,7 +116,7 @@ def main():
             )
 
             # Obstakels spawnen
-            state["spawn_timer"] += 1.05
+            state["spawn_timer"] += 1.10
             if state["spawn_timer"] > 60:
                 state["obstacles"].append(spawn_obstacle())
                 state["spawn_timer"] = 0
